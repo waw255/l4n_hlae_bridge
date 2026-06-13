@@ -7,13 +7,13 @@
 
 ---
 
-> ⚠️ **AI 生成声明**
+> ⚠️ **AI-Generated Project**
 >
-> 本项目**全部代码、测试、开发均由 AI 完成**，无任何人工参与编写代码。
+> This project's **entire codebase, tests, and development were done by AI**, with no human participation in writing code.
 >
-> - 代码中的 bug **无法由人工修复**——此项目的维护者不直接编写或 debug 源代码
-> - 提交到 [Issues](https://github.com/sparkling/l4n-hlae-bridge/issues) 的 bug 报告**可能无法得到有效响应**
-> - 请仅将此项目作为参考实现，自行承担使用风险
+> - Bugs in the code **cannot be fixed by humans** — this project's maintainer does not directly write or debug source code
+> - Bug reports submitted to [Issues](https://github.com/sparkling/l4n-hlae-bridge/issues) **may not receive meaningful responses**
+> - Use this project only as a reference implementation, at your own risk
 
 ---
 
