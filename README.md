@@ -80,16 +80,34 @@ Double-click `uninstall_l4n_hlae.bat` from the `l4n_hlae_bridge` folder. It rest
 Requires MinGW-w64 i686 (32-bit), tested with GCC 16.1.0.
 
 ```bash
-# eat_hook.dll
+# eat_hook.dll (core KERNEL32 EAT hook)
 gcc -shared -m32 -o eat_hook.dll src/eat_hook.c -s -static-libgcc -Wl,--subsystem,windows
 
-# l4n_hlae_launcher.exe
+# l4n_hlae_launcher.exe (SUSPENDED injector)
 gcc -m32 -mconsole -o l4n_hlae_launcher.exe src/inject2.c -s -static-libgcc
 
-# DXVK proxy
-echo "int __stdcall DllMain(void*h,unsigned long r,void*v){return 1;}" > stub.c
+# DXVK proxy stub (generate stub.c, then build)
+echo int __stdcall DllMain(void* h,unsigned long r,void* v){return 1;} > stub.c
 gcc -shared -m32 -o bin/dxvk_d3d9.dll stub.c src/proxy_dxvk.def -s -static-libgcc -Wl,--subsystem,windows,--kill-at
 ```
+
+## Files
+
+| File | Size | Description |
+|------|------|-------------|
+| `l4n_hlae_launcher.exe` | 48 KB | SUSPENDED process injector |
+| `eat_hook.dll` | 16 KB | KERNEL32 EAT hook, intercepts LoadLibrary |
+| `bin\dxvk_d3d9.dll` | 14 KB | DXVK proxy — forwards 20 D3D9 exports to real DXVK |
+| `bin\dxvk_d3d9_real.dll` | ~4.3 MB | Original DXVK d3d9 (backup, untouched) |
+| `install_l4n_hlae.bat` | ~3 KB | One-click install script |
+| `launch_l4n_hlae.bat` | <1 KB | Quick launch |
+| `uninstall_l4n_hlae.bat` | ~2 KB | Cleanup script |
+| `README.md` | | English documentation |
+| `README_zh.md` | | Chinese documentation |
+| `src\eat_hook.c` | ~2 KB | EAT hook source |
+| `src\inject2.c` | ~5 KB | Injector source |
+| `src\proxy_dxvk.c` | ~2 KB | DXVK proxy DllMain stub |
+| `src\proxy_dxvk.def` | ~1 KB | DXVK proxy export forwarding definitions |
 
 ## License
 

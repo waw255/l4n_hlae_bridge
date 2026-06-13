@@ -11,8 +11,9 @@ gcc -shared -m32 -o eat_hook.dll src/eat_hook.c -s -static-libgcc -Wl,--subsyste
 # l4n_hlae_launcher.exe (SUSPENDED injector)
 gcc -m32 -mconsole -o l4n_hlae_launcher.exe src/inject2.c -s -static-libgcc
 
-# DXVK proxy dll (ordinal-exact forwarder)
-gcc -shared -m32 -o bin/dxvk_d3d9.dll src/proxy_dxvk_stub.c src/proxy_dxvk.def -s -static-libgcc -Wl,--subsystem,windows,--kill-at
+# DXVK proxy stub (generate stub.c, then build)
+echo int __stdcall DllMain(void* h,unsigned long r,void* v){return 1;} > stub.c
+gcc -shared -m32 -o bin/dxvk_d3d9.dll stub.c src/proxy_dxvk.def -s -static-libgcc -Wl,--subsystem,windows,--kill-at
 ```
 
 ## Architecture

@@ -2,7 +2,7 @@
 setlocal
 
 rem install_l4n_hlae.bat - L4N + HLAE Bridge Installer
-rem Developer: sparkling  Version: 1.1
+rem Developer: sparkling  Version: 1.3
 
 set "GAME_ROOT=%cd%"
 if exist "%GAME_ROOT%\left4dead2.exe" goto root_found

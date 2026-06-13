@@ -1,6 +1,6 @@
 ﻿/*
  * eat_hook.c — KERNEL32 EAT Hook for L4N+HLAE Bridge
- * Developer: sparkling  Version: 1.3  2026-06-10
+ * Developer: sparkling  Version: 1.3  2026-06-13
  */
 #include <windows.h>
 

@@ -1,3 +1,7 @@
+/*
+ * inject2.c — SUSPENDED Process Injector for L4N+HLAE Bridge
+ * Developer: sparkling  Version: 1.3  2026-06-13
+ */
 #include <windows.h>
 #include <stdio.h>
 

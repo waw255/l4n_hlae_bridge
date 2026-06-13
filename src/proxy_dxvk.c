@@ -3,7 +3,7 @@
  * proxy_dxvk.c — DXVK d3d9 代理 DLL 桩
  *
  * Developer / 开发者: sparkling
- * Version / 版本: 1.1
+ * Version / 版本: 1.3
  *
  * What this does / 功能说明:
  *   This is a minimal DLL that provides a DllMain stub. All actual

@@ -135,11 +135,14 @@ hlae_2_189_7\            （或任何以 "hlae" 开头的文件夹名）
 复制后应该能看到：
 ```
 Left 4 Dead 2\
-├── l4n_hlae_bridge\        ← 桥接工具文件夹（你刚复制进来的）
+├── l4n_hlae_bridge\        ← 桥接工具文件夹
 │   ├── README.md
 │   ├── README_zh.md
+│   ├── AGENTS.md
+│   ├── LICENSE
 │   ├── install_l4n_hlae.bat
 │   ├── launch_l4n_hlae.bat
+│   ├── uninstall_l4n_hlae.bat
 │   ├── l4n_hlae_launcher.exe
 │   ├── eat_hook.dll
 │   ├── bin\dxvk_d3d9.dll
@@ -358,12 +361,15 @@ rmdir /s /q l4n_hlae_bridge
 | `bin\dxvk_d3d9_real.dll` | ~4.3 MB | 原始 DXVK d3d9（备份，未被修改） |
 | `install_l4n_hlae.bat` | ~3 KB | 一键安装脚本 |
 | `launch_l4n_hlae.bat` | ~0.1 KB | 快速启动（在终端中直接运行注入器） |
+| `uninstall_l4n_hlae.bat` | ~2 KB | 卸载脚本 |
 | `README.md` | | 英文文档 |
 | `README_zh.md` | 本文件 | 中文文档 |
-| `src\eat_hook.c` | ~8 KB | EAT hook 源码 |
+| `AGENTS.md` | | 开发者参考文档 |
+| `LICENSE` | | MIT 许可证 |
+| `src\eat_hook.c` | ~2 KB | EAT hook 源码 |
 | `src\inject2.c` | ~5 KB | 注入器源码 |
-| `src\proxy_dxvk.c` | ~3 KB | DXVK 代理源码 (DllMain 桩) |
-| `src\proxy_dxvk.def` | ~2 KB | DXVK 代理导出转发定义 |
+| `src\proxy_dxvk.c` | ~2 KB | DXVK 代理源码 (DllMain 桩) |
+| `src\proxy_dxvk.def` | ~1 KB | DXVK 代理导出转发定义 |
 
 ---
 
@@ -377,20 +383,20 @@ rmdir /s /q l4n_hlae_bridge
 ### 编译 eat_hook.dll
 
 ```bash
-gcc -shared -m32 -o eat_hook.dll eat_hook.c -s -static-libgcc -Wl,--subsystem,windows
+gcc -shared -m32 -o eat_hook.dll src/eat_hook.c -s -static-libgcc -Wl,--subsystem,windows
 ```
 
 ### 编译 l4n_hlae_launcher.exe
 
 ```bash
-gcc -m32 -mconsole -o l4n_hlae_launcher.exe inject2.c -s -static-libgcc
+gcc -m32 -mconsole -o l4n_hlae_launcher.exe src/inject2.c -s -static-libgcc
 ```
 
 ### 编译 DXVK 代理
 
 ```bash
-echo "int __stdcall DllMain(void* h, unsigned long r, void* v) { return 1; }" > stub.c
-gcc -shared -m32 -o dxvk_d3d9.dll stub.c proxy_dxvk.def -s -static-libgcc -Wl,--subsystem,windows,--kill-at
+echo int __stdcall DllMain(void* h,unsigned long r,void* v){return 1;} > stub.c
+gcc -shared -m32 -o bin/dxvk_d3d9.dll stub.c src/proxy_dxvk.def -s -static-libgcc -Wl,--subsystem,windows,--kill-at
 ```
 
 ### 测试
@@ -411,28 +417,6 @@ l4n_hlae_launcher.exe left4dead2.exe eat_hook.dll AfxHookSource.dll -steam -inse
 - **DXVK -vulkan 模式：** 目前仅测试了通过 `-vulkan` 启动项加载 DXVK 的方式。
 - **HLAE 版本：** 使用 HLAE 2.189.7 构建和测试。其他版本可能可用，但不保证。
 - **退出崩溃：** 通过游戏内菜单或 Alt+F4 退出时可能触发 L4N 断言弹窗。**解决方案：** 关闭启动器控制台窗口——它使用 `TerminateProcess` 干净结束游戏，完全绕过 shutdown 流程。
-
----
-
-## 鼠标转键翻译
-
-使用 mirv_input camera 时 L4N 会锁定鼠标。桥接内置热键方案：
-
-**默认热键：** Ctrl+Alt+\（反斜杠键）
-
-按一次切换开关状态，再按一次关闭。开关状态记录在 eat_hook.log 文件中。
-
-**配置（可选）：** 在游戏根目录创建 mouse2key.ini：
-
-`ini
-[mouse2key]
-modifiers=MOD_CONTROL|MOD_ALT
-key=VK_F8                        ; 换成F8键
-; 其他可选: VK_OEM_5, VK_OEM_3 (~键), 0xDE
-speed=1.5                        ; 鼠标灵敏度(0.5-10)
-`
-
-参见 l4n_hlae_bridge\mouse2key.example.ini 完整示例。
 
 ---
 
