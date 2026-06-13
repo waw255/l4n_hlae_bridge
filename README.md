@@ -121,7 +121,7 @@ Your original HLAE folder and L4N installation are untouched. After cleanup, ver
 ## Known Limitations
 
 - **Exit crash:** Using in-game Exit or Alt+F4 may show an L4N assertion popup. Close the launcher console window instead.
-- **Mouse lock in `mirv_input camera`:** L4N's VGUI intercepts mouse input at the DirectInput level, causing cursor lock. Workaround: add `-hide_neko` to the launch command (disables L4N rendering but restores mouse control).
+- **Mouse lock in `mirv_input camera`:** Mouse cursor locks to the top-left corner of the screen. Press Esc to recover. L4N's VGUI intercepts input at a lower level (RawInput/DirectInput) — this is beyond what the bridge layer can fix. Use the arrow keys to control the camera instead.
 - **IAT layout dependent:** The IAT replay mechanism relies on specific RVA values in L4N's `left4dead2.exe` (v2.33.2 tested). Future L4N versions may need re-verification.
 - **32-bit only:** L4D2 is a 32-bit application.
 

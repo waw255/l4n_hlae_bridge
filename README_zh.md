@@ -457,6 +457,7 @@ l4n_hlae_launcher.exe left4dead2.exe eat_hook.dll AfxHookSource.dll -steam -inse
 - **仅 32 位：** Left 4 Dead 2 是 32 位程序。此桥接仅支持 32 位。
 - **DXVK -vulkan 模式：** 目前仅测试了通过 `-vulkan` 启动项加载 DXVK 的方式。
 - **HLAE 版本：** 使用 HLAE 2.189.7 构建和测试。其他版本可能可用，但不保证。
+- **mirv_input camera 鼠标锁定：** 使用后鼠标光标锁定在屏幕**左上角**，按 Esc 恢复。L4N 的 VGUI 在更底层（RawInput/DirectInput）拦截了输入，这超出了桥接层能修复的范围。只能使用**方向键**来控制视角。
 - **退出崩溃：** 通过游戏内菜单或 Alt+F4 退出时可能触发 L4N 断言弹窗。**解决方案：** 关闭启动器控制台窗口——它使用 `TerminateProcess` 干净结束游戏，完全绕过 shutdown 流程。
 
 ---
