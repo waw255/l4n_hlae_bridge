@@ -1,0 +1,4 @@
+*.log
+*.mdmp
+*.o
+src/*_stub.c
