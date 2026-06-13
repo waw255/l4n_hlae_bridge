@@ -2,3 +2,4 @@
 *.mdmp
 *.o
 src/*_stub.c
+release/
