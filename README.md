@@ -5,6 +5,18 @@
 
 > 中文文档：[README_zh.md](README_zh.md)
 
+---
+
+> ⚠️ **AI 生成声明**
+>
+> 本项目**全部代码、测试、开发均由 AI 完成**，无任何人工参与编写代码。
+>
+> - 代码中的 bug **无法由人工修复**——此项目的维护者不直接编写或 debug 源代码
+> - 提交到 [Issues](https://github.com/sparkling/l4n-hlae-bridge/issues) 的 bug 报告**可能无法得到有效响应**
+> - 请仅将此项目作为参考实现，自行承担使用风险
+
+---
+
 A compatibility layer that allows [L4N](https://afdian.com/a/neko_left4dead2) (L4D2 client rendering patch) and [HLAE](https://github.com/advancedfx/advancedfx) (Half-Life Advanced Effects) to coexist in Left 4 Dead 2.
 
 ## Problem
@@ -49,24 +61,62 @@ mirv_input
 
 See [HLAE Wiki](https://github.com/advancedfx/advancedfx/wiki) for full command reference.
 
-## Installation Details
+## Scripts
 
-The installer automatically:
-- Detects your game root (works from any subfolder)
-- Finds your HLAE installation (any folder containing "hlae" in its name)
-- Backs up your original DXVK d3d9 and deploys the proxy
-- Copies all required files into place
+### `install_l4n_hlae.bat` (one-click setup)
 
-**Requirements:**
+Must be run from inside the `l4n_hlae_bridge\` folder.
+
+**Auto-detection:**
+- Game root: checks current dir for `left4dead2.exe`, then parent dir
+- HLAE folder: scans for directories matching `*hlae*`, `*HLAE*`, `*Hlae*` — verifies `AfxHookSource.dll` + `AfxCppCli.dll` inside
+
+**What it does (3 steps):**
+
+| Step | Action |
+|------|--------|
+| 1/3 | Copies **all** `.dll` files from the detected HLAE folder into the game root |
+| 2/3 | Backs up `bin\dxvk_d3d9.dll` → `bin\dxvk_d3d9_real.dll` (only once), then deploys the 14 KB proxy over it. If a proxy already exists, saves it to `.dll.bak` first. |
+| 3/3 | Copies `l4n_hlae_launcher.exe`, `eat_hook.dll`, `launch_l4n_hlae.bat`, `uninstall_l4n_hlae.bat` into the game root |
+
+**Warnings it can show:**
+- `left4neko.dll not found` — L4N may not be installed
+- `bin\dxvk_d3d9.dll not found` — DXVK may not be installed
+
+**Errors it can show:**
+- `left4dead2.exe not found!` — not run from inside the game folder structure
+- `HLAE folder not found!` — no directory with `AfxHookSource.dll` found; it prints the download URL
+
+### `launch_l4n_hlae.bat` (game launcher)
+
+Can be run from either the game root or `l4n_hlae_bridge\` folder.
+
+**Auto-detection:** looks for `l4n_hlae_launcher.exe` + `eat_hook.dll` + `AfxHookSource.dll` in the current dir, then parent. Exits with an error if not found (run `install_l4n_hlae.bat` first).
+
+**EXE size check:** warns if `left4dead2.exe` is < 500 KB (original Steam version — L4N may not be active).
+
+**Launches:** `l4n_hlae_launcher.exe left4dead2.exe eat_hook.dll AfxHookSource.dll -steam -insecure -vulkan`
+
+The console window stays open. **Close this window to exit the game safely** (uses `TerminateProcess` to avoid L4N assertion popups).
+
+### `uninstall_l4n_hlae.bat` (cleanup)
+
+Must be run from inside the game root (or the `l4n_hlae_bridge\` folder). Auto-detects game root the same way as the installer. Prompts for Y/N confirmation.
+
+| Step | Action |
+|------|--------|
+| 1/3 | Restores DXVK: deletes the proxy, renames `dxvk_d3d9_real.dll` back to `dxvk_d3d9.dll`. Skips if no backup exists. |
+| 2/3 | Removes bridge files from game root: `l4n_hlae_launcher.exe`, `eat_hook.dll`, `launch_l4n_hlae.bat`, `install_l4n_hlae.bat`, `uninstall_l4n_hlae.bat` |
+| 3/3 | Deletes all HLAE DLL copies from game root (16+ files: `AfxHookSource.dll`, `AfxCppCli.dll`, OpenEXR, MSVC runtimes, etc.) |
+
+Your original HLAE folder and L4N installation are untouched. After cleanup, verify game files in Steam to re-download the original `bin\dxvk_d3d9.dll` if desired.
+
+### Requirements
 - Windows 10+ (64-bit)
 - Left 4 Dead 2 (Steam version)
-- L4N client patch installed
-- HLAE installed in the game root
-- DXVK loaded via `-vulkan` launch option
-
-## Uninstall
-
-Double-click `uninstall_l4n_hlae.bat` from the `l4n_hlae_bridge` folder. It restores the original DXVK, removes all bridge files, and cleans up HLAE DLL copies. Your L4N and HLAE installations are untouched.
+- L4N client patch installed (exe ~607 KB)
+- HLAE installed in a directory inside the game root
+- DXVK `bin\dxvk_d3d9.dll` (~4.3 MB) present
 
 ## Known Limitations
 

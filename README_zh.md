@@ -6,6 +6,16 @@
 >
 > English: [README.md](README.md)
 
+> ⚠️ **AI 生成声明**
+>
+> 本项目**全部代码、测试、开发均由 AI 完成**，无任何人工参与编写代码。
+>
+> - 代码中的 bug **无法由人工修复**——此项目的维护者不直接编写或 debug 源代码
+> - 提交到 [Issues](https://github.com/sparkling/l4n-hlae-bridge/issues) 的 bug 报告**可能无法得到有效响应**
+> - 请仅将此项目作为参考实现，自行承担使用风险
+
+---
+
 让 **L4N 客户端补丁** 与 **HLAE (Half-Life Advanced Effects) AfxHookSource.dll** 在 Left 4 Dead 2 中共存。
 
 ---
@@ -156,14 +166,25 @@ Left 4 Dead 2\
 
 **3a.** 从 `l4n_hlae_bridge\` 文件夹中双击 `install_l4n_hlae.bat`。
 
-脚本会自动：
-- 检测游戏根目录（即使在 bridge 文件夹内双击也能正常工作）
-- 找到你的 HLAE 文件夹（搜索名称包含 "hlae" 的文件夹）
-- 将所有需要的文件复制到位
+**脚本自动检测逻辑：**
+- **游戏根目录**：先在当前目录找 `left4dead2.exe`，找不到则到上级目录找
+- **HLAE 文件夹**：扫描所有名称匹配 `*hlae*`、`*HLAE*`、`*Hlae*` 的文件夹，验证其中是否同时存在 `AfxHookSource.dll` 和 `AfxCppCli.dll`
 
-**3b.** 如果脚本报告了错误：
-- 它会明确告诉你缺少什么（找不到 HLAE 等）
-- 查看下面的[常见问题](#常见问题)部分
+**脚本执行的 3 个步骤：**
+
+| 步骤 | 操作 |
+|------|------|
+| 1/3 复制 HLAE DLL | 将检测到的 HLAE 文件夹中**全部** `.dll` 文件复制到游戏根目录 |
+| 2/3 部署 DXVK 代理 | 将 `bin\dxvk_d3d9.dll` 备份为 `bin\dxvk_d3d9_real.dll`（仅首次），然后用 14 KB 的桥接代理覆盖。如果已有一个代理，先另存为 `.dll.bak`。 |
+| 3/3 复制启动器文件 | 将 `l4n_hlae_launcher.exe`、`eat_hook.dll`、`launch_l4n_hlae.bat`、`uninstall_l4n_hlae.bat` 复制到游戏根目录 |
+
+**可能出现的警告：**
+- `left4neko.dll not found` — L4N 可能未安装
+- `bin\dxvk_d3d9.dll not found` — DXVK 可能未安装
+
+**可能出现的错误：**
+- `left4dead2.exe not found!` — 脚本不在游戏目录结构中。会提示 Steam 浏览本地文件的路径。
+- `HLAE folder not found!` — 找不到包含 `AfxHookSource.dll` 的文件夹。会打印 HLAE 下载链接。
 
 ### 第四步：验证安装
 
@@ -187,7 +208,13 @@ Left 4 Dead 2\
 
 ### 方法一：使用启动脚本（推荐）
 
-在游戏根目录双击 `launch_l4n_hlae.bat`
+在游戏根目录双击 `launch_l4n_hlae.bat`（也可从 `l4n_hlae_bridge\` 文件夹内双击）。
+
+**脚本内部行为：**
+- 自动检测游戏根目录：先在当前目录找 `l4n_hlae_launcher.exe`、`eat_hook.dll`、`AfxHookSource.dll`，找不到则到上级目录
+- exe 大小检查：如果 `left4dead2.exe` < 500 KB，警告"可能是原版 Steam 版本——L4N 可能未激活"
+- 未找到必要文件时：报错并退出，提示先运行 `install_l4n_hlae.bat`
+- 启动命令：`l4n_hlae_launcher.exe left4dead2.exe eat_hook.dll AfxHookSource.dll -steam -insecure -vulkan`
 
 ### 方法二：命令行
 
@@ -323,7 +350,21 @@ L4N 替换了 `left4dead2.exe`，这个修改过的 exe 在启动早期就加载
 
 ## 卸载
 
-完全移除桥接工具：
+### 推荐方式：使用卸载脚本
+
+从游戏根目录（或 `l4n_hlae_bridge\` 文件夹内）双击 `uninstall_l4n_hlae.bat`。
+
+脚本自动检测游戏根目录（与安装器相同的两级查找逻辑），然后显示 Y/N 确认提示。输入 `Y` 后执行三步：
+
+| 步骤 | 操作 |
+|------|------|
+| 1/3 还原 DXVK | 删除代理 `dxvk_d3d9.dll`，将备份 `dxvk_d3d9_real.dll` 重命名回 `dxvk_d3d9.dll`。无备份则跳过。 |
+| 2/3 删除桥接文件 | 移除游戏根目录中的：`l4n_hlae_launcher.exe`、`eat_hook.dll`、`launch_l4n_hlae.bat`、`install_l4n_hlae.bat`、`uninstall_l4n_hlae.bat` |
+| 3/3 清理 HLAE DLL | 删除从 HLAE 复制过来的所有 DLL（16+ 个文件：`AfxHookSource.dll`、`AfxCppCli.dll`、OpenEXR 系列、MSVC 运行时等） |
+
+最后显示移除数量和警告数。你的原始 HLAE 文件夹和 L4N 安装不受影响。
+
+### 备选方式：手动卸载
 
 ```batch
 REM 恢复原版 DXVK d3d9
